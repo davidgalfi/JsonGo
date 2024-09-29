@@ -29,6 +29,7 @@ To use JsonGo, ensure you have Python installed. Clone the repository from GitHu
 
 ```bash
 git clone https://github.com/davidgalfi/JsonGo.git
+```
 
 ### Usage 📖
 
