@@ -4,7 +4,7 @@
 
 JsonGo is a Python library for parsing, manipulating, and validating JSON data. It offers a simple interface to convert JSON files and strings into Python dictionaries and vice versa, while also providing basic validation checks to ensure the integrity of the JSON structure.
 
-### Table of Contents
+### Table of Contents 📑
 - [Features](#features-✨)
 - [Installation](#installation-🔧)
 - [Usage](#usage-📖)
