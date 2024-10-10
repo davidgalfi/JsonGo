@@ -2,7 +2,6 @@ from datetime import datetime
 
 class JsonGo:
     def __init__(self, path = None):        
-        self.__number_of_entry = 0
         self.json_string = ""
         
         if path:
@@ -11,7 +10,7 @@ class JsonGo:
             self.json_data = []
  
     def length(self) -> int:
-        return self.__number_of_entry
+        return len(self.json_data)
     
     def convertToDic(self, path: str) -> list:
         
@@ -83,7 +82,6 @@ class JsonGo:
                     result[key] = list_of_values
                 else:    
                     result[key] = value
-                self.__number_of_entry += 1
             python_dicts.append(result)
         
         return python_dicts
@@ -154,7 +152,6 @@ class JsonGo:
                     result[key] = list_of_values
                 else:    
                     result[key] = value
-                self.__number_of_entry += 1
             python_dicts.append(result)
         
         return python_dicts
