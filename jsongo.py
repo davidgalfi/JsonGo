@@ -31,14 +31,16 @@ class JsonGo:
                 byte_code = file.read()
                 json_file = byte_code.decode('utf-8')
         except Exception as e:
-            print(f"An error occured while converting: {e}")
+            raise Exception(f"An error occured while converting: {e}")
         
         self.json_string = json_file
         
-        self.JSON_Validator_self()
+        # Call JSON validator function
+        self.JSON_Validator()
         
         json_object = []
         
+        # Remove '[' and ']' from the JSON string
         if json_file.startswith("["):
             inside_array = json_file.strip()[1:-1].strip()
         else:
@@ -84,8 +86,7 @@ class JsonGo:
                     result[key] = value
             python_dicts.append(result)
         
-        return python_dicts
-    
+        return python_dicts    
     def convertStringToDic(self, json: str) -> list:
 
         """
@@ -104,7 +105,7 @@ class JsonGo:
         if not json:
             raise Exception("String is empty!")
         
-        self.JSON_Validator_string(json)
+        self.JSON_Validator(json_string=json)
         
         json_data = json
         json_object = []
@@ -156,7 +157,7 @@ class JsonGo:
         
         return python_dicts
     
-    def convertToJson(self, dic=None, path=""):
+    def convertToJson(self, dic=None, path=None):
         """
         Converts a given dictionary or the dictionaries stored in the object itself to a JSON string and writes it to a file.
 
@@ -259,7 +260,7 @@ class JsonGo:
             if isinstance(json, dict):
                 self.json_data.append(json)
             elif isinstance(json, str):
-                self.JSON_Validator_string(json)
+                self.JSON_Validator(json_string=json)
                 converted_string = self.convertStringToDic(json)
                 self.json_data.extend(converted_string)
             else:
@@ -267,7 +268,7 @@ class JsonGo:
         else:
             raise Exception(f"{json} is empty!")
         
-    def JSON_Validator_Path(self, path: str):
+    def JSON_Validator(self, path = None, json_string = None):
         
         """
         Validates a JSON file against the standard JSON format.
@@ -278,80 +279,17 @@ class JsonGo:
         Raises:
             Exception: If the file does not exist or the JSON is not valid.
         """
-        if not path:
-            raise Exception("No path given!")
-        
-        try:
-            with open(path, 'rb') as file:
-                byte_code = file.read()
-                json_file = byte_code.decode('utf-8')
-        except Exception as e:
-            e.add_note("File not found!")
-        
-        if json_file.count('[') != json_file.count(']'):
-            raise Exception("The number of '[' does not equal with the number of ']'!")
-        
-        if json_file.count('{') != json_file.count('}'):
-            raise Exception("The number of '{' does not equal with the number of '}'!")
-        
-        if json_file.count('"') % 2 != 0:
-            raise Exception("Not valid JSON format!")
-        
-        for i, char in enumerate(json_file):
-            if char == ':':
-                if i - 2 <= 0:
-                    raise Exception("Not valid JSON format!")
-                if json_file[i - 1] not in ' "':
-                    raise Exception("Not valid JSON format!")
-                elif json_file[i - 1] in ' ' and json_file[i - 2] not in '"':
-                    raise Exception("Not valid JSON format!")
-        return True    
-    
-    def JSON_Validator_self(self):
-        """
-        Validates the JSON string stored in the object against the standard JSON format.
-
-        Raises:
-            Exception: If the JSON is not valid.
-        """
-        if not self.json_string:
-            return True
-        
-        json_file = self.json_string
-        
-        if json_file.count('[') != json_file.count(']'):
-            raise Exception("The number of '[' does not equal with the number of ']'!")
-        
-        if json_file.count('{') != json_file.count('}'):
-            raise Exception("The number of '{' does not equal with the number of '}'!")
-        
-        if json_file.count('"') % 2 != 0:
-            raise Exception("Not valid JSON format!")
-        
-        for i, char in enumerate(json_file):
-            if char == ':':
-                if i - 2 <= 0:
-                    raise Exception("Not valid JSON format!")
-                if json_file[i - 1] not in ' "':
-                    raise Exception("Not valid JSON format!")
-                elif json_file[i - 1] in ' ' and json_file[i - 2] not in '"':
-                    raise Exception("Not valid JSON format!")
-        return True
-    
-    def JSON_Validator_string(self, string):
-        """
-        Validates a given JSON string against the standard JSON format.
-
-        Args:
-            string (str): The JSON string to be validated.
-
-        Raises:
-            Exception: If the JSON is not valid.
-        """
-        if not string:
-            raise Exception("Empty string!")
-        
-        json_file = string
+        if path:
+            try:
+                with open(path, 'rb') as file:
+                    byte_code = file.read()
+                    json_file = byte_code.decode('utf-8')
+            except Exception as e:
+                e.add_note("File not found!")
+        elif json_string:
+            json_file = json_string
+        else:
+            json_file = self.json_string
         
         if json_file.count('[') != json_file.count(']'):
             raise Exception("The number of '[' does not equal with the number of ']'!")
