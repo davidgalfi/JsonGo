@@ -2,7 +2,6 @@ from datetime import datetime
 
 class JsonGo:
     def __init__(self, path = None):        
-        self.json_string = ""
         
         if path:
             self.json_data = self.convertToDic(path=path)
@@ -12,31 +11,36 @@ class JsonGo:
     def length(self) -> int:
         return len(self.json_data)
     
-    def convertToDic(self, path: str) -> list:
+    def convertToDic(self, path = None, json_string = None) -> list:
         
         """
         Converts a JSON file into a list of dictionaries.
 
         Args:
             path (str): The path to the JSON file.
+            json_string (str): JSON formated string value 
 
         Returns:
             list: A list of dictionaries, where each dictionary represents a JSON object from the file.
 
         Raises:
             Exception: If the file does not contain valid JSON.
+            Exception: If the given string does not contain valid JSON.
         """
-        try:
-            with open(path, 'rb') as file:
-                byte_code = file.read()
-                json_file = byte_code.decode('utf-8')
-        except Exception as e:
-            raise Exception(f"An error occured while converting: {e}")
-        
-        self.json_string = json_file
+        if path:   
+            try:
+                with open(path, 'rb') as file:
+                    byte_code = file.read()
+                    json_file = byte_code.decode('utf-8')
+            except Exception as e:
+                raise Exception(f"An error occured while converting: {e}")
+        elif json_string:
+            json_file = json_string
+        else:
+            raise Exception("No path or string given!")
         
         # Call JSON validator function
-        self.JSON_Validator()
+        self.JSON_Validator(json_string=json_file)
         
         json_object = []
         
@@ -85,76 +89,7 @@ class JsonGo:
                     result[key] = value
             python_dicts.append(result)
         
-        return python_dicts    
-    def convertStringToDic(self, json: str) -> list:
-
-        """
-        Converts a JSON string into a list of dictionaries.
-
-        Args:
-            json (str): The JSON string to be converted.
-
-        Returns:
-            list: A list of dictionaries, where each dictionary represents a JSON object from the string.
-
-        Raises:
-            Exception: If the string does not contain valid JSON.
-            Exception: If the given string is empty.
-        """
-        if not json:
-            raise Exception("String is empty!")
-        
-        self.JSON_Validator(json_string=json)
-        
-        json_file = json
-        json_object = []
-        
-        inside_array = json_file.strip()
-        if json_file.startswith("["):
-            inside_array = json_file.strip()[1:-1].strip()
-        
-        current_object = ''
-        open_braces = 0
-        
-        for char in inside_array:
-            if char == '{':
-                open_braces += 1
-            elif char == '}':
-                open_braces -= 1
-            
-            current_object += char
-            
-            if open_braces == 0 and current_object.strip():
-                json_object.append(current_object.strip())
-                current_object = ''
-
-        cleaned_objects = []
-        open_braces = 0
-                
-        cleaned_objects = [obj for obj in json_object if obj != ","]
-        
-        python_dicts = []
-        
-        for obj in cleaned_objects:
-            result = {}
-            json_str = obj.strip('{} ')
-            entries = json_str.split(',\n')
-            for entry in entries:
-                key, value = entry.split(':')
-                key = key.strip().strip('"')
-                value = value.strip().strip('"')
-                if "[" in value:
-                    value = value.strip('[]').strip()
-                    list_of_values = value.split(",")
-                    for i in range(len(list_of_values)):
-                        list_of_values[i] = list_of_values[i].strip().strip('"')
-                    result[key] = list_of_values
-                else:    
-                    result[key] = value
-            python_dicts.append(result)
-        
-        return python_dicts
-    
+        return python_dicts   
     def convertToJson(self, dic=None, path=None):
         """
         Converts a given dictionary or the dictionaries stored in the object itself to a JSON string and writes it to a file.
@@ -259,7 +194,7 @@ class JsonGo:
                 self.json_data.append(json)
             elif isinstance(json, str):
                 self.JSON_Validator(json_string=json)
-                converted_string = self.convertStringToDic(json)
+                converted_string = self.convertToDic(json_string=json)
                 self.json_data.extend(converted_string)
             else:
                 raise Exception("Only dictionary or string accepted!")
