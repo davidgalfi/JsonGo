@@ -136,7 +136,7 @@ class JsonGo:
             return string
         return ""
 
-    def toString(self, dic) -> str:
+    def toString(self, dic = None) -> str:
         if dic:
             string = "["
             for entry in self.json_data:
@@ -148,6 +148,8 @@ class JsonGo:
             string = string[:-1]
             string += "\n]"
             return string
+        elif self.json_data:
+            self.head(number=len(self.json_data)-1)
         return ""
         
     def head(self, number=5) -> str:
@@ -222,7 +224,7 @@ class JsonGo:
         elif json_string:
             json_file = json_string
         else:
-            json_file = self.json_string
+            json_file = self.toString(dic=self.json_data)
         
         if json_file.count('[') != json_file.count(']'):
             raise Exception("The number of '[' does not equal with the number of ']'!")
