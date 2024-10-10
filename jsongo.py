@@ -1,16 +1,15 @@
 from datetime import datetime
 
 class JsonGo:
-    def __init__(self):        
-        self.json_data = []
+    def __init__(self, path = None):        
         self.__number_of_entry = 0
         self.json_string = ""
-    
-    def __init__(self, path: str):
-        self.__number_of_entry = 0
-        self.json_string = ""
-        self.json_data = self.convertToDic(path=path)
-               
+        
+        if path:
+            self.json_data = self.convertToDic(path=path)
+        else: 
+            self.json_data = []
+ 
     def length(self) -> int:
         return self.__number_of_entry
     
