@@ -40,11 +40,10 @@ class JsonGo:
         
         json_object = []
         
-        # Remove '[' and ']' from the JSON string
+        # Remove '[' and ']' from the JSON string if they exist
+        inside_array = json_file.strip()
         if json_file.startswith("["):
             inside_array = json_file.strip()[1:-1].strip()
-        else:
-            inside_array = json_file.strip()
         
         current_object = ''
         open_braces = 0
@@ -107,13 +106,12 @@ class JsonGo:
         
         self.JSON_Validator(json_string=json)
         
-        json_data = json
+        json_file = json
         json_object = []
         
-        if json_data.startswith("["):
-            inside_array = json_data.strip()[1:-1].strip()
-        else:
-            inside_array = json_data.strip()
+        inside_array = json_file.strip()
+        if json_file.startswith("["):
+            inside_array = json_file.strip()[1:-1].strip()
         
         current_object = ''
         open_braces = 0
