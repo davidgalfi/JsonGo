@@ -46,7 +46,7 @@ class JsonGo:
         
         return self.parse_json(json_str=json_file)
 
-    def parse_json(self, json_str):
+    def parse_json(self, json_str) -> list:
         def parse_value(index):
             print(f"parse_value : index: {index}, json_str[index]: {json_str[index]}")
             if json_str[index] == '{':
@@ -114,8 +114,16 @@ class JsonGo:
             else:
                 return value_str.strip('"'), end_index
 
-        result, _ = parse_object(0)
-        return [result]
+        results = []
+        index = 0
+        while index < len(json_str):
+            if json_str[index] in '{[':  # Start of an object or array
+                result, new_index = parse_value(index)
+                results.append(result)
+                index = new_index
+            else:
+                index += 1
+        return results
     
     def convertToJson(self, dic=None, path=None):
         """
@@ -149,6 +157,7 @@ class JsonGo:
 
         raise Exception("Wrong usage!")
     
+    
     def __str__(self) -> str:
         if self.json_data:
             string = "["
@@ -161,8 +170,8 @@ class JsonGo:
             string = string[:-1]
             string += "\n]"
             return string
-        return ""
-
+        return
+    
     def toString(self, dic = None) -> str:
         if dic:
             string = "["
