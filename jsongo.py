@@ -40,58 +40,86 @@ class JsonGo:
             json_file = json_string
         else:
             raise Exception("No path or string given!")
-        
+
         # Call JSON validator function
         self.JSON_Validator(json_string=json_file)
         
-        json_object = []
+        json_file = json_file.replace("\n", "").replace("\r", "").replace(" ", "").strip('[] ')
         
-        # Remove '[' and ']' from the JSON string if they exist
-        inside_array = json_file.strip()
-        if json_file.startswith("["):
-            inside_array = json_file.strip()[1:-1].strip()
-        
-        current_object = ''
-        open_braces = 0
-        
-        for char in inside_array:
-            if char == '{':
-                open_braces += 1
-            elif char == '}':
-                open_braces -= 1
-            
-            current_object += char
-            
-            if open_braces == 0 and current_object.strip():
-                json_object.append(current_object.strip())
-                current_object = ''
+        return self.parse_json(json_str=json_file)
 
-        cleaned_objects = []
-        open_braces = 0
-                
-        cleaned_objects = [obj for obj in json_object if obj != ","]
-        
-        python_dicts = []
-        
-        for obj in cleaned_objects:
-            result = {}
-            json_str = obj.strip('{} ')
-            entries = json_str.split(',\r\n')
-            for entry in entries:
-                key, value = entry.split(':')
-                key = key.strip().strip('"')
-                value = value.strip().strip('"')
-                if "[" in value:
-                    value = value.strip('[]').strip()
-                    list_of_values = value.split(",")
-                    for i in range(len(list_of_values)):
-                        list_of_values[i] = list_of_values[i].strip().strip('"')
-                    result[key] = list_of_values
-                else:    
-                    result[key] = value
-            python_dicts.append(result)
-        
-        return python_dicts   
+    def parse_json(self, json_str) -> list:
+        def parse_value(index):
+            if json_str[index] == '{':
+                return parse_object(index)
+            elif json_str[index] == '[':
+                return parse_array(index)
+            elif json_str[index] == '"':
+                return parse_string(index)
+            else:
+                return parse_primitive(index)
+
+        def parse_object(index):
+            obj = {}
+            index += 1  # Skip '{'
+            while index < len(json_str) and json_str[index] != '}':
+                key, index = parse_string(index)
+                index += 1  # Skip ':'
+                value, index = parse_value(index)
+                obj[key] = value
+                if index < len(json_str) and json_str[index] == ',':
+                    index += 1  # Skip ','
+            return obj, index + 1  # Skip '}'
+
+        def parse_array(index):
+            array = []
+            index += 1  # Skip '['
+            while index < len(json_str) and json_str[index] != ']':
+                value, index = parse_value(index)
+                array.append(value)
+                if index < len(json_str) and json_str[index] == ',':
+                    index += 1  # Skip ','
+            return array, index + 1  # Skip ']'
+
+        def parse_string(index):
+            end_index = index + 1
+            while end_index < len(json_str):
+                if json_str[end_index] == '"':
+                    break
+                end_index += 1
+            return json_str[index + 1:end_index], end_index + 1
+
+        def parse_primitive(index):
+            end_index = index
+            while end_index < len(json_str) and json_str[end_index] not in ',]}':
+                end_index += 1
+            value_str = json_str[index:end_index].strip()
+            if value_str.isdigit() or (value_str.startswith('-') and value_str[1:].isdigit()):
+                return int(value_str), end_index
+            try:
+                return float(value_str), end_index
+            except ValueError:
+                pass
+            if value_str.lower() == 'true':
+                return True, end_index
+            elif value_str.lower() == 'false':
+                return False, end_index
+            elif value_str.lower() == 'null':
+                return None, end_index
+            else:
+                return value_str.strip('"'), end_index
+
+        results = []
+        index = 0
+        while index < len(json_str):
+            if json_str[index] in '{[':  # Start of an object or array
+                result, new_index = parse_value(index)
+                results.append(result)
+                index = new_index
+            else:
+                index += 1
+        return results
+    
     def convertToJson(self, dic=None, path=None):
         """
         Converts a given dictionary or the dictionaries stored in the object itself to a JSON string and writes it to a file.
@@ -220,17 +248,7 @@ class JsonGo:
         else:
             raise Exception(f"{json} is empty!")
         
-    def JSON_Validator(self, path = None, json_string = None):
-        
-        """
-        Validates a JSON file against the standard JSON format.
-
-        Args:
-            path (str): The path to the JSON file.
-
-        Raises:
-            Exception: If the file does not exist or the JSON is not valid.
-        """
+    def JSON_Validator(self, path=None, json_string=None):
         if path:
             try:
                 with open(path, 'rb') as file:
@@ -242,22 +260,13 @@ class JsonGo:
             json_file = json_string
         else:
             json_file = self.toString(dic=self.json_data)
-        
+
         if json_file.count('[') != json_file.count(']'):
             raise Exception("The number of '[' does not equal with the number of ']'!")
-        
+
         if json_file.count('{') != json_file.count('}'):
             raise Exception("The number of '{' does not equal with the number of '}'!")
-        
+
         if json_file.count('"') % 2 != 0:
             raise Exception("Not valid JSON format!")
-        
-        for i, char in enumerate(json_file):
-            if char == ':':
-                if i - 2 <= 0:
-                    raise Exception("Not valid JSON format!")
-                if json_file[i - 1] not in ' "':
-                    raise Exception("Not valid JSON format!")
-                elif json_file[i - 1] in ' ' and json_file[i - 2] not in '"':
-                    raise Exception("Not valid JSON format!")
         return True
