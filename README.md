@@ -38,26 +38,38 @@ git clone https://github.com/davidgalfi/JsonGo.git
 Below are some examples of how to use the JsonGo library:
 
 ```python
-from jsongo import JsonGo
+# Usage Example for JsonGo Class
 
-# Initialize with a path to a JSON file
-json_parser = JsonGo("path/to/your/jsonfile.json")
+from jsongo import JsonGo  # Assuming the class is saved in a file named json_go.py
 
-# Convert file content to dictionary
-data = json_parser.convertToDic("path/to/your/jsonfile.json")
+# Initialize JsonGo with a JSON file path
+json_parser = JsonGo(path='json2.json')
 
-# Add new entry
-json_parser.add({"new_key": "new_value"})
+# Print the number of JSON objects
+print(f"Number of JSON objects: {json_parser.length()}")
 
-# Convert dictionary back to a JSON file
-json_parser.convertToJson(path="output.json")
+# Convert JSON data to a list of dictionaries
+json_data = json_parser.convertToDic(path='json2.json')
+print(f"Converted JSON data: {json_data}")
 
-# Print formatted JSON string
-print(json_parser)
+# Add a new dictionary to the current JSON data
+new_data = {"name": "John Doe", "age": 30}
+json_parser.add(new_data)
 
-# Validate a JSON string
-is_valid = json_parser.JSON_Validator_string('{"key": "value"}')
-print("Is valid:", is_valid)
+# Convert the current JSON data to a JSON string and save it to a file
+json_parser.convertToJson(path='output.json')
+
+# Display the first few entries of the JSON data
+print("First few entries:")
+print(json_parser.head(number=3))
+
+# Fetch and validate JSON data from an API
+try:
+    api_data = json_parser.getAPI('https://dummyapi.online/api/users')
+    json_parser.json_data = api_data
+    print(f"Fetched API data: {json_parser.head()}")
+except Exception as e:
+    print(f"Error fetching API data: {e}")
 ```
 
 ## Upcoming Features 🚀
