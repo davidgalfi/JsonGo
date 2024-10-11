@@ -15,6 +15,7 @@ JsonGo is a Python library for parsing, manipulating, and validating JSON data. 
 ### Features ✨
 
 - **Convert JSON Files to Dictionaries**: Load and parse JSON data from files into Python dictionaries.
+- **Support for Nested JSON**: Extend the parsing logic to handle nested JSON objects and arrays, which are common in real-world data.
 - **Convert Strings to Dictionaries**: Parse JSON strings directly into Python dictionaries.
 - **Convert Dictionaries to JSON**: Serialize Python dictionaries back into JSON format and save them to files.
 - **Basic JSON Validation**: Check the structural integrity of JSON data, including balanced brackets and proper formatting.
@@ -62,7 +63,6 @@ print("Is valid:", is_valid)
 
 More features are coming soon to JsonGo! Here's a sneak peek at what's in development:
 
-- **Support for Nested JSON**: Extend the parsing logic to handle nested JSON objects and arrays, which are common in real-world data.
 - **Error Handling Improvements**: Improve error handling by using custom exception classes. This can make it easier to debug and understand issues when they arise.
 - **Search and Filter Functionality**:
   - Add methods to search for specific keys or values within the JSON data.
@@ -70,7 +70,6 @@ More features are coming soon to JsonGo! Here's a sneak peek at what's in develo
 - **Delete Operations**: Provide methods to update or delete entries within the JSON data, allowing for more dynamic data manipulation.
 - **Integration with External APIs**: Add functionality to fetch JSON data from external APIs or URLs, enhancing the class's utility in web applications.
 - **Performance Optimization**: Review the code for performance bottlenecks, especially in parsing large JSON files, and optimize where possible.
-- **Serialization/Deserialization Support**: Implement serialization and deserialization methods to easily convert Python objects into JSON strings and vice versa.
 - **Command-Line Interface (CLI)**: Create a CLI tool that utilizes this class for processing JSON files from the command line, offering features like conversion, validation, and formatting.
 
 Stay tuned for these updates, and feel free to contribute if you'd like to help bring these features to life! 🤝
