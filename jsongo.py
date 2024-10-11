@@ -1,4 +1,6 @@
 from datetime import datetime
+import urllib.error
+import urllib.request
 
 class JsonGo:
     def __init__(self, path = None):        
@@ -38,7 +40,7 @@ class JsonGo:
             json_file = json_string
         else:
             raise Exception("No path or string given!")
-        
+
         # Call JSON validator function
         self.JSON_Validator(json_string=json_file)
         
@@ -48,7 +50,6 @@ class JsonGo:
 
     def parse_json(self, json_str) -> list:
         def parse_value(index):
-            print(f"parse_value : index: {index}, json_str[index]: {json_str[index]}")
             if json_str[index] == '{':
                 return parse_object(index)
             elif json_str[index] == '[':
@@ -59,22 +60,18 @@ class JsonGo:
                 return parse_primitive(index)
 
         def parse_object(index):
-            print(f"parse_object : index: {index}, json_str[index]: {json_str[index]}")
             obj = {}
             index += 1  # Skip '{'
             while index < len(json_str) and json_str[index] != '}':
                 key, index = parse_string(index)
                 index += 1  # Skip ':'
-                print(f"parse_object : index: {index}, json_str[index]: {json_str[index]}")
                 value, index = parse_value(index)
                 obj[key] = value
-                print(f"parse_object : index: {index}, json_str[index]: {json_str[index]}")
                 if index < len(json_str) and json_str[index] == ',':
                     index += 1  # Skip ','
             return obj, index + 1  # Skip '}'
 
         def parse_array(index):
-            print(f"parse_array : index: {index}, json_str[index]: {json_str[index]}")
             array = []
             index += 1  # Skip '['
             while index < len(json_str) and json_str[index] != ']':
@@ -85,7 +82,6 @@ class JsonGo:
             return array, index + 1  # Skip ']'
 
         def parse_string(index):
-            print(f"parse_string : index: {index}, json_str[index]: {json_str[index]}")
             end_index = index + 1
             while end_index < len(json_str):
                 if json_str[end_index] == '"':
@@ -94,7 +90,6 @@ class JsonGo:
             return json_str[index + 1:end_index], end_index + 1
 
         def parse_primitive(index):
-            print(f"parse_primitive : index: {index}, json_str[index]: {json_str[index]}")
             end_index = index
             while end_index < len(json_str) and json_str[end_index] not in ',]}':
                 end_index += 1
@@ -139,7 +134,7 @@ class JsonGo:
         if not path:
             now = datetime.now()
             date_timer_str = now.strftime("%Y-%m-%d_%H-%M-%S")
-            path = date_timer_str + "_json.json" 
+            path = date_timer_str + "_json.json"
 
         if dic:
             string = self.toString(dic=dic)
@@ -157,6 +152,20 @@ class JsonGo:
 
         raise Exception("Wrong usage!")
     
+    def getAPI(self, url: str) -> str:
+        
+        if not url:
+            raise Exception("No URL given!")
+        
+        try:
+            with urllib.request.urlopen(url) as response:
+                raw_data = response.read().decode('utf-8')
+                self.JSON_Validator(json_string=raw_data)
+                return raw_data
+        except urllib.error.HTTPError as e:
+            raise Exception(f"HTTP error: code: {e.code} reason: {e.reason}")
+        except urllib.error.URLError as e:
+            raise Exception(f"URL error: reason: {e.reason}")
     
     def __str__(self) -> str:
         if self.json_data:
@@ -170,8 +179,8 @@ class JsonGo:
             string = string[:-1]
             string += "\n]"
             return string
-        return
-    
+        return ""
+
     def toString(self, dic = None) -> str:
         if dic:
             string = "["

@@ -1,11 +1,10 @@
-from jsoncompiler import JsonGo
+from jsongo import JsonGo
 
-testcase = JsonGo(path="jsongo\json2.json")
-string = """{
-    "value1" : 123
-}
-"""
-testcase.add(string)
-print(testcase.head())
-testcase.convertToJson()
+testcase = JsonGo()
 
+path = "https://dummyapi.online/api/todos"
+json_string = testcase.getAPI(path)
+
+
+json_data = testcase.convertToDic(json_string=json_string)
+print(json_data.head())
